@@ -3,63 +3,80 @@
 namespace App\Http\Controllers;
 
 use App\Models\CalendarioPublicacion;
+use App\Models\Servicio;
+use App\Models\Trabajador;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CalendarioPublicacionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $calendarios = CalendarioPublicacion::with('servicio', 'responsableMarketing')->paginate(10);
+        return view('calendarios-publicacion.index', compact('calendarios'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $servicios = Servicio::all();
+        $trabajadores = Trabajador::all();
+        return view('calendarios-publicacion.create', compact('servicios', 'trabajadores'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'servicio_id' => 'required|exists:servicios,id',
+            'responsable_marketing_id' => 'nullable|exists:trabajadores,id',
+            'mes_publicacion' => 'required|string|max:20',
+            'anio_publicacion' => 'required|integer|min:2000|max:2100',
+            'url_documento' => 'nullable|url',
+            'estado' => ['required', Rule::in(CalendarioPublicacion::ESTADOS)],
+            'fecha_creacion' => 'nullable|date',
+            'fecha_aprobacion' => 'nullable|date',
+            'fecha_publicacion' => 'nullable|date'
+        ]);
+
+        CalendarioPublicacion::create($request->all());
+
+        return redirect()->route('calendarios-publicacion.index')->with('success', 'Calendario de publicación creado exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(CalendarioPublicacion $calendarioPublicacion)
     {
-        //
+        $calendarioPublicacion->load('servicio', 'responsableMarketing', 'artes');
+        return view('calendarios-publicacion.show', compact('calendarioPublicacion'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(CalendarioPublicacion $calendarioPublicacion)
     {
-        //
+        $servicios = Servicio::all();
+        $trabajadores = Trabajador::all();
+        return view('calendarios-publicacion.edit', compact('calendarioPublicacion', 'servicios', 'trabajadores'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, CalendarioPublicacion $calendarioPublicacion)
     {
-        //
+        $request->validate([
+            'servicio_id' => 'required|exists:servicios,id',
+            'responsable_marketing_id' => 'nullable|exists:trabajadores,id',
+            'mes_publicacion' => 'required|string|max:20',
+            'anio_publicacion' => 'required|integer|min:2000|max:2100',
+            'url_documento' => 'nullable|url',
+            'estado' => ['required', Rule::in(CalendarioPublicacion::ESTADOS)],
+            'fecha_creacion' => 'nullable|date',
+            'fecha_aprobacion' => 'nullable|date',
+            'fecha_publicacion' => 'nullable|date'
+        ]);
+
+        $calendarioPublicacion->update($request->all());
+
+        return redirect()->route('calendarios-publicacion.index')->with('success', 'Calendario de publicación actualizado exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(CalendarioPublicacion $calendarioPublicacion)
     {
-        //
+        $calendarioPublicacion->delete();
+        return redirect()->route('calendarios-publicacion.index')->with('success', 'Calendario de publicación eliminado exitosamente.');
     }
 }

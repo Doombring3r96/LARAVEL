@@ -3,63 +3,78 @@
 namespace App\Http\Controllers;
 
 use App\Models\ArteCalendario;
+use App\Models\CalendarioPublicacion;
+use App\Models\Trabajador;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ArteCalendarioController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $artes = ArteCalendario::with('calendario', 'disenador')->paginate(10);
+        return view('artes-calendario.index', compact('artes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $calendarios = CalendarioPublicacion::all();
+        $trabajadores = Trabajador::all();
+        return view('artes-calendario.create', compact('calendarios', 'trabajadores'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'calendario_id' => 'required|exists:calendarios_publicacion,id',
+            'disenador_id' => 'nullable|exists:trabajadores,id',
+            'titulo' => 'nullable|string|max:100',
+            'copy' => 'nullable|string',
+            'descripcion' => 'nullable|string',
+            'fecha_publicacion_programada' => 'nullable|date',
+            'url_arte' => 'nullable|url',
+            'estado' => ['required', Rule::in(ArteCalendario::ESTADOS)]
+        ]);
+
+        ArteCalendario::create($request->all());
+
+        return redirect()->route('artes-calendario.index')->with('success', 'Arte de calendario creado exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(ArteCalendario $arteCalendario)
     {
-        //
+        $arteCalendario->load('calendario', 'disenador');
+        return view('artes-calendario.show', compact('arteCalendario'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(ArteCalendario $arteCalendario)
     {
-        //
+        $calendarios = CalendarioPublicacion::all();
+        $trabajadores = Trabajador::all();
+        return view('artes-calendario.edit', compact('arteCalendario', 'calendarios', 'trabajadores'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, ArteCalendario $arteCalendario)
     {
-        //
+        $request->validate([
+            'calendario_id' => 'required|exists:calendarios_publicacion,id',
+            'disenador_id' => 'nullable|exists:trabajadores,id',
+            'titulo' => 'nullable|string|max:100',
+            'copy' => 'nullable|string',
+            'descripcion' => 'nullable|string',
+            'fecha_publicacion_programada' => 'nullable|date',
+            'url_arte' => 'nullable|url',
+            'estado' => ['required', Rule::in(ArteCalendario::ESTADOS)]
+        ]);
+
+        $arteCalendario->update($request->all());
+
+        return redirect()->route('artes-calendario.index')->with('success', 'Arte de calendario actualizado exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(ArteCalendario $arteCalendario)
     {
-        //
+        $arteCalendario->delete();
+        return redirect()->route('artes-calendario.index')->with('success', 'Arte de calendario eliminado exitosamente.');
     }
 }

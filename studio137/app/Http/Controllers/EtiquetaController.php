@@ -7,59 +7,57 @@ use Illuminate\Http\Request;
 
 class EtiquetaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $etiquetas = Etiqueta::paginate(10);
+        return view('etiquetas.index', compact('etiquetas'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('etiquetas.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:50|unique:etiquetas,nombre',
+            'color' => 'nullable|string|max:20',
+            'descripcion' => 'nullable|string'
+        ]);
+
+        Etiqueta::create($request->all());
+
+        return redirect()->route('etiquetas.index')->with('success', 'Etiqueta creada exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Etiqueta $etiqueta)
     {
-        //
+        $etiqueta->load('tareas');
+        return view('etiquetas.show', compact('etiqueta'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Etiqueta $etiqueta)
     {
-        //
+        return view('etiquetas.edit', compact('etiqueta'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Etiqueta $etiqueta)
     {
-        //
+        $request->validate([
+            'nombre' => 'required|string|max:50|unique:etiquetas,nombre,' . $etiqueta->id,
+            'color' => 'nullable|string|max:20',
+            'descripcion' => 'nullable|string'
+        ]);
+
+        $etiqueta->update($request->all());
+
+        return redirect()->route('etiquetas.index')->with('success', 'Etiqueta actualizada exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Etiqueta $etiqueta)
     {
-        //
+        $etiqueta->delete();
+        return redirect()->route('etiquetas.index')->with('success', 'Etiqueta eliminada exitosamente.');
     }
 }
