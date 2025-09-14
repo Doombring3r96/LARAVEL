@@ -6,21 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('notificaciones', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
+            $table->text('mensaje');
+            $table->boolean('leido')->default(false);
+            $table->enum('origen_tipo', ['actividad', 'tarea', 'calendario', 'campaña', 'pago']);
+            $table->integer('origen_id');
+            $table->timestamp('fecha_generada')->useCurrent();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('notificaciones');
     }

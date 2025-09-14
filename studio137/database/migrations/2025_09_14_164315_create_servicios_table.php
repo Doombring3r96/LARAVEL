@@ -6,21 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('servicios', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
+            $table->enum('tipo', ['identidad corporativa', 'marketing digital', 'campañas publicitarias']);
+            $table->text('descripcion')->nullable();
+            $table->date('fecha_inicio')->nullable();
+            $table->date('fecha_fin_estimada')->nullable();
+            $table->enum('estado', ['en espera', 'en proceso', 'en revisión', 'finalizado', 'cancelado'])->default('en espera');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('servicios');
     }

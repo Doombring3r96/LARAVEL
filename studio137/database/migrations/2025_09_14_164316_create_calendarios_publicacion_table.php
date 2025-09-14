@@ -6,21 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('calendarios_publicacion', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('servicio_id')->constrained('servicios')->onDelete('cascade');
+            $table->foreignId('responsable_marketing_id')->nullable()->constrained('trabajadores')->onDelete('set null');
+            $table->string('mes_publicacion', 20);
+            $table->year('anio_publicacion');
+            $table->text('url_documento')->nullable();
+            $table->enum('estado', ['borrador', 'revisión', 'aprobado', 'publicado'])->default('borrador');
+            $table->date('fecha_creacion')->nullable();
+            $table->date('fecha_aprobacion')->nullable();
+            $table->date('fecha_publicacion')->nullable();
             $table->timestamps();
+            
+            $table->index('fecha_publicacion');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('calendarios_publicacion');
     }

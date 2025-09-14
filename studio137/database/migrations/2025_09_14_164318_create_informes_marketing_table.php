@@ -6,21 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('informes_marketing', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->foreignId('servicio_id')->constrained('servicios')->onDelete('cascade');
+            $table->string('titulo', 100);
+            $table->text('descripcion')->nullable();
+            $table->text('url_archivo');
+            $table->enum('tipo', ['campaña', 'calendario', 'otro'])->default('campaña');
+            $table->boolean('visible_para_cliente')->default(true);
+            $table->foreignId('creado_por')->nullable()->constrained('users')->onDelete('set null');
+            $table->timestamp('fecha_subida')->useCurrent();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('informes_marketing');
     }
