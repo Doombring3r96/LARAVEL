@@ -22,6 +22,11 @@ class Servicio extends Model
         'estado'
     ];
 
+    protected $casts = [
+        'fecha_inicio' => 'datetime',
+        'fecha_fin_estimada' => 'datetime',
+    ];
+
     public const TIPOS = ['identidad corporativa', 'marketing digital', 'campañas publicitarias'];
     public const ESTADOS = ['en espera', 'en proceso', 'en revisión', 'finalizado', 'cancelado'];
 

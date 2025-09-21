@@ -62,9 +62,13 @@ Route::middleware(['auth', 'check.admin'])->group(function () {
 
 // Rutas para clientes
 Route::middleware(['auth', 'check.cliente'])->group(function () {
-    Route::get('/client/dashboard', [ClienteController::class, 'dashboard'])->name('client.dashboard');
+    Route::get('/dashboard', [ClienteController::class, 'dashboard'])->name('dashboard');
     Route::get('/client/services', [ClienteController::class, 'services'])->name('client.services');
-    // Otras rutas para clientes
+    Route::get('/client/services/{servicio}', [ClienteController::class, 'serviceDetail'])->name('client.service.detail');
+    Route::put('/client/services/{servicio}/update-task/{tarea}', [ClienteController::class, 'updateTask'])->name('client.task.update');
+    Route::get('/client/reports', [ClienteController::class, 'reports'])->name('client.reports');
+    Route::get('/client/payments', [ClienteController::class, 'payments'])->name('client.payments');
+    Route::post('/client/payments/{pago}/upload', [ClienteController::class, 'uploadPayment'])->name('client.payment.upload');
 });
 
 // Rutas para trabajadores
