@@ -71,6 +71,19 @@
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
         </div>
+        @auth
+            @if(auth()->user()->isCeo())
+                <!-- Mostrar elementos para CEO -->
+            @endif
+            
+            @if(auth()->user()->isDirectorCuentas())
+                <!-- Mostrar elementos para Director de Cuentas -->
+            @endif
+            
+            @if(auth()->user()->isCliente())
+                <!-- Mostrar elementos para Cliente -->
+            @endif
+        @endauth
 
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
