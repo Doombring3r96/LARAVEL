@@ -23,18 +23,21 @@ class UserSeeder extends Seeder
             'password' => $hashedPassword,
             'tipo' => 'administrador',
             'estado' => 'activo',
+            'subtipo'=>'director_cuentas'
         ]);
         User::create([
             'email' => 'admin2@studio137.com',
             'password' => $hashedPassword,
             'tipo' => 'administrador',
             'estado' => 'activo',
+            'subtipo'=>'director_creativo'
         ]);
         User::create([
             'email' => 'admin3@studio137.com',
             'password' => $hashedPassword,
             'tipo' => 'administrador',
             'estado' => 'activo',
+            'subtipo'=>'CEO'
         ]);
 
         // Insertar trabajadores
@@ -43,12 +46,14 @@ class UserSeeder extends Seeder
             'password' => $hashedPassword,
             'tipo' => 'trabajador',
             'estado' => 'activo',
+            'subtipo'=>'disenador_grafico'
         ]);
         User::create([
             'email' => 'trabajador2@studio137.com',
             'password' => $hashedPassword,
             'tipo' => 'trabajador',
             'estado' => 'activo',
+            'subtipo'=>'marketing'
         ]);
 
         // Insertar cliente

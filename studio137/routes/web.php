@@ -62,7 +62,7 @@ Route::middleware(['auth', 'check.admin'])->group(function () {
 
 // Rutas para clientes
 Route::middleware(['auth', 'check.cliente'])->group(function () {
-    Route::get('/dashboard', [ClienteController::class, 'dashboard'])->name('dashboard');
+    Route::get('/client/dashboard', [ClienteController::class, 'dashboard'])->name('client.dashboard');
     Route::get('/client/services', [ClienteController::class, 'services'])->name('client.services');
     Route::get('/client/services/{servicio}', [ClienteController::class, 'serviceDetail'])->name('client.service.detail');
     Route::put('/client/services/{servicio}/update-task/{tarea}', [ClienteController::class, 'updateTask'])->name('client.task.update');
@@ -73,9 +73,11 @@ Route::middleware(['auth', 'check.cliente'])->group(function () {
 
 // Rutas para trabajadores
 Route::middleware(['auth', 'check.trabajador'])->group(function () {
+    Route::get('/worker/dashboard', [TrabajadorController::class, 'dashboard'])->name('worker.dashboard');
     Route::get('/worker/tasks', [TrabajadorController::class, 'tasks'])->name('worker.tasks');
-    // Otras rutas para trabajadores
+    Route::get('/worker/tasks/{tarea}', [TrabajadorController::class, 'taskDetail'])->name('worker.task.detail');
+    Route::put('/worker/tasks/{tarea}/update', [TrabajadorController::class, 'updateTask'])->name('worker.task.update');
+    Route::get('/worker/payments', [TrabajadorController::class, 'payments'])->name('worker.payments');
 });
-
 
 require __DIR__.'/auth.php';

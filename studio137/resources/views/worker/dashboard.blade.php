@@ -2,128 +2,112 @@
     <x-slot name="header">
         <h2>Dashboard del Trabajador</h2>
     </x-slot>
-    
+
     <div class="row">
-        <!-- Estadísticas Rápidas -->
-        <div class="col-12 mb-4">
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <div class="card bg-primary text-white">
-                        <div class="card-body text-center">
-                            <h4 class="card-title">{{ $tareasStats['total'] }}</h4>
-                            <p class="card-text">Total Tareas</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card bg-success text-white">
-                        <div class="card-body text-center">
-                            <h4 class="card-title">{{ $tareasStats['completadas'] }}</h4>
-                            <p class="card-text">Completadas</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card bg-warning text-dark">
-                        <div class="card-body text-center">
-                            <h4 class="card-title">{{ $tareasStats['en_proceso'] }}</h4>
-                            <p class="card-text">En Proceso</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card bg-danger text-white">
-                        <div class="card-body text-center">
-                            <h4 class="card-title">{{ $tareasStats['retrasadas'] }}</h4>
-                            <p class="card-text">Retrasadas</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Gráfico de Tareas por Servicio -->
-        <div class="col-lg-8 mb-4">
+        <!-- Resumen de Tareas -->
+        <div class="col-md-8 mb-4">
             <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Tareas por Servicio</h5>
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0"><i class="fas fa-tasks me-2"></i>Mis Tareas</h5>
+                    <a href="{{ route('worker.tasks') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-list me-1"></i> Ver Todas
+                    </a>
                 </div>
                 <div class="card-body">
-                    <canvas id="tasksByServiceChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tareas Recientes -->
-        <div class="col-lg-4 mb-4">
-            <div class="card">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="card-title mb-0"><i class="fas fa-tasks me-2"></i>Tareas Recientes</h5>
-                </div>
-                <div class="card-body">
-                    @foreach($tareas->take(5) as $tarea)
-                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
-                        <div>
-                            <h6 class="mb-1">{{ Str::limit($tarea->titulo, 25) }}</h6>
-                            <small class="text-muted">{{ $tarea->actividad->servicio->tipo }}</small>
-                        </div>
-                        <span class="badge bg-{{ $tarea->prioridad == 'alta' ? 'danger' : ($tarea->prioridad == 'media' ? 'warning' : 'success') }}">
-                            {{ $tarea->prioridad }}
-                        </span>
+                    @if($tareas->isEmpty())
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No tienes tareas asignadas en este momento.</p>
                     </div>
-                    @endforeach
-                    <div class="text-center mt-3">
-                        <a href="{{ route('worker.tasks') }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-list me-1"></i> Ver Todas las Tareas
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tareas que Requieren Atención -->
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="card-title mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Tareas que Requieren Atención</h5>
-                </div>
-                <div class="card-body">
-                    @php
-                        $tareasUrgentes = $tareas->where('prioridad', 'alta')->where('estado', '!=', 'completada');
-                    @endphp
-                    
-                    @if($tareasUrgentes->isEmpty())
-                    <p class="text-muted text-center mb-0">No hay tareas urgentes pendientes.</p>
                     @else
-                    <div class="table-responsive">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Tarea</th>
-                                    <th>Servicio</th>
-                                    <th>Cliente</th>
-                                    <th>Fecha Límite</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($tareasUrgentes as $tarea)
-                                <tr>
-                                    <td>{{ $tarea->titulo }}</td>
-                                    <td>{{ $tarea->actividad->servicio->tipo }}</td>
-                                    <td>{{ $tarea->actividad->servicio->cliente->nombre_empresa }}</td>
-                                    <td>{{ $tarea->fecha_fin_estimada->format('d/m/Y') }}</td>
-                                    <td>
-                                        <a href="{{ route('worker.task.detail', $tarea) }}" class="btn btn-sm btn-primary">
-                                            <i class="fas fa-edit me-1"></i> Trabajar
-                                        </a>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <div class="row">
+                        @foreach($tareas->take(6) as $tarea)
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100 border-0 shadow-sm priority-{{ $tarea->prioridad }}">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ Str::limit($tarea->titulo, 30) }}</h6>
+                                        <span class="badge bg-{{ $tarea->prioridad == 'alta' ? 'danger' : ($tarea->prioridad == 'media' ? 'warning' : 'success') }}">
+                                            {{ $tarea->prioridad }}
+                                        </span>
+                                    </div>
+                                    <p class="card-text small text-muted mb-2">
+                                        {{ $tarea->actividad->servicio->tipo }} - 
+                                        {{ $tarea->actividad->servicio->cliente->nombre_empresa }}
+                                    </p>
+                                    <p class="card-text small">
+                                        <span class="badge 
+                                            @if($tarea->estado == 'completada') bg-success
+                                            @elseif(in_array($tarea->estado, ['en curso', 'en revisión'])) bg-primary
+                                            @elseif($tarea->estado == 'retrasada') bg-danger
+                                            @else bg-warning text-dark
+                                            @endif">
+                                            {{ $tarea->estado }}
+                                        </span>
+                                    </p>
+                                    @if($tarea->fecha_fin_estimada)
+                                    <p class="card-text small text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ \Carbon\Carbon::parse($tarea->fecha_fin_estimada)->format('d/m/Y') }}
+                                    </p>
+                                    @endif
+                                    <a href="{{ route('worker.task.detail', $tarea) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i> Ver Detalles
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
                     @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Estadísticas y Gráfico -->
+        <div class="col-md-4 mb-4">
+            <!-- Estadísticas Rápidas -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Estadísticas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-2">
+                                <h4 class="text-primary">{{ $tareasStats['total'] }}</h4>
+                                <small class="text-muted">Total Tareas</small>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="border rounded p-2">
+                                <h4 class="text-success">{{ $tareasStats['completadas'] }}</h4>
+                                <small class="text-muted">Completadas</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-warning">{{ $tareasStats['en_proceso'] }}</h4>
+                                <small class="text-muted">En Proceso</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-danger">{{ $tareasStats['retrasadas'] }}</h4>
+                                <small class="text-muted">Retrasadas</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Tareas por Servicio -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0"><i class="fas fa-chart-pie me-2"></i>Tareas por Servicio</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="servicesChart" height="200"></canvas>
                 </div>
             </div>
         </div>
@@ -133,16 +117,16 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Gráfico de tareas por servicio
-            const ctx = document.getElementById('tasksByServiceChart').getContext('2d');
-            const tasksByServiceChart = new Chart(ctx, {
-                type: 'bar',
+            const ctx = document.getElementById('servicesChart').getContext('2d');
+            const servicesChart = new Chart(ctx, {
+                type: 'pie',
                 data: {
                     labels: {!! json_encode($tareasPorServicio->keys()) !!},
                     datasets: [{
-                        label: 'Tareas por Servicio',
                         data: {!! json_encode($tareasPorServicio->values()) !!},
                         backgroundColor: [
-                            '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1'
+                            '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1',
+                            '#e83e8c', '#fd7e14', '#20c997', '#6610f2', '#6c757d'
                         ],
                         borderWidth: 1
                     }]
@@ -151,15 +135,7 @@
                     responsive: true,
                     plugins: {
                         legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: 1
-                            }
+                            position: 'bottom',
                         }
                     }
                 }

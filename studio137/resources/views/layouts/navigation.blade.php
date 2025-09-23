@@ -1,7 +1,11 @@
 <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-fluid">
         <!-- Logo -->
-        <a class="navbar-brand" href="{{ route('dashboard') }}">
+        <a class="navbar-brand" href="{{ 
+            auth()->user()->isCliente() ? route('client.dashboard') : 
+            (auth()->user()->isDisenadorGrafico() || auth()->user()->isMarketing() ? route('worker.dashboard') : 
+            route('dashboard')) 
+        }}">
             <i class="fas fa-studio-vinyl me-2"></i>
             Studio137
         </a>
@@ -13,10 +17,18 @@
 
         <!-- Navigation Content -->
         <div class="collapse navbar-collapse" id="navbarContent">
-            <!-- Navigation Links -->
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <!-- User Info -->
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                    <span class="nav-link">
+                        @if(auth()->user()->isDisenadorGrafico())
+                        <i class="fas fa-palette me-1"></i> Diseñador Gráfico
+                        @elseif(auth()->user()->isMarketing())
+                        <i class="fas fa-bullhorn me-1"></i> Community Manager
+                        @elseif(auth()->user()->isCliente())
+                        <i class="fas fa-user-tie me-1"></i> Cliente
+                        @endif
+                    </span>
                 </li>
             </ul>
 
